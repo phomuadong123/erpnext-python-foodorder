@@ -1,4 +1,4 @@
-# Production overrides — giới hạn log (bind: FRONTEND_BIND=127.0.0.1, cổng FRONTEND_PORT=5454 trong .env).
+# Production overrides — giới hạn log (khuyến nghị: FRONTEND_BIND=127.0.0.1, FRONTEND_PORT=4455).
 # Chạy: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 services:
   frontend:
