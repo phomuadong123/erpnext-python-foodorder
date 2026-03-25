@@ -14,7 +14,7 @@ services:
       - logs:/home/frappe/frappe-bench/logs
     environment:
       DB_HOST: db
-      DB_PORT: "3306"
+      DB_PORT: "3308"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       ZALO_APP_ID: ${ZALO_APP_ID}
@@ -46,7 +46,7 @@ services:
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
     environment:
       DB_HOST: db
-      DB_PORT: "3306"
+      DB_PORT: "3308"
       REDIS_CACHE: redis-cache:6379
       REDIS_QUEUE: redis-queue:6379
       SOCKETIO_PORT: "9000"
@@ -232,6 +232,18 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
+      
+  nginx:
+    image: nginx:alpine
+    networks:
+      - frappe_network
+    depends_on:
+      - frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx-site.conf:/etc/nginx/conf.d/default.conf
 
 volumes:
   db-data:
