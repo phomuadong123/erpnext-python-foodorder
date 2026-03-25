@@ -1,0 +1,65 @@
+# Production overrides — giới hạn log (bind: FRONTEND_BIND=127.0.0.1, cổng FRONTEND_PORT=5454 trong .env).
+# Chạy: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+services:
+  frontend:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  queue-long:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  queue-short:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  scheduler:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  websocket:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis-queue:
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  redis-cache:
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
