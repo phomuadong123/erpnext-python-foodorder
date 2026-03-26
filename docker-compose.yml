@@ -2,10 +2,15 @@ version: "3.9"
 
 services:
   backend:
-    image: frappe/frappe-worker:v15
+    image: frappe/erpnext:v15
     networks:
       - frappe_network
     restart: unless-stopped
+    working_dir: /home/frappe/frappe-bench
+    command: >
+      bash -c "
+      bench start
+      "
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -28,15 +33,14 @@ services:
       - redis-queue
 
   create-site:
-    image: frappe/frappe-worker:v15
+    image: frappe/erpnext:v15
     networks:
       - frappe_network
     restart: "no"
-    volumes:
-      - sites:/home/frappe/frappe-bench/sites
+    working_dir: /home/frappe/frappe-bench
     entrypoint: bash -c
     command: >
-      sleep 10;
+      sleep 15;
       if [ ! -d "sites/${SITE_NAME}" ]; then
         bench new-site ${SITE_NAME}
         --admin-password=${ADMIN_PASSWORD}
@@ -45,14 +49,17 @@ services:
       else
         echo "Site exists";
       fi
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
     depends_on:
       - backend
 
   frontend:
-    image: frappe/nginx:v15
+    image: frappe/erpnext:v15
     networks:
       - frappe_network
     restart: unless-stopped
+    command: nginx-entrypoint.sh
     ports:
       - "80:8080"
     environment:
@@ -67,46 +74,35 @@ services:
       - websocket
 
   websocket:
-    image: frappe/frappe-worker:v15
+    image: frappe/erpnext:v15
     networks:
       - frappe_network
     restart: unless-stopped
-    command: node /home/frappe/frappe-bench/apps/frappe/socketio.js
-    environment:
-      REDIS_CACHE: redis-cache:6379
-      REDIS_QUEUE: redis-queue:6379
+    working_dir: /home/frappe/frappe-bench
+    command: node apps/frappe/socketio.js
     volumes:
       - sites:/home/frappe/frappe-bench/sites
     depends_on:
       - backend
 
-  queue-short:
-    image: frappe/frappe-worker:v15
+  queue:
+    image: frappe/erpnext:v15
     networks:
       - frappe_network
     restart: unless-stopped
-    command: bench worker --queue short,default
-    volumes:
-      - sites:/home/frappe/frappe-bench/sites
-    depends_on:
-      - backend
-
-  queue-long:
-    image: frappe/frappe-worker:v15
-    networks:
-      - frappe_network
-    restart: unless-stopped
-    command: bench worker --queue long,default,short
+    working_dir: /home/frappe/frappe-bench
+    command: bench worker
     volumes:
       - sites:/home/frappe/frappe-bench/sites
     depends_on:
       - backend
 
   scheduler:
-    image: frappe/frappe-worker:v15
+    image: frappe/erpnext:v15
     networks:
       - frappe_network
     restart: unless-stopped
+    working_dir: /home/frappe/frappe-bench
     command: bench schedule
     volumes:
       - sites:/home/frappe/frappe-bench/sites
@@ -120,9 +116,6 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - db-data:/var/lib/mysql
 
