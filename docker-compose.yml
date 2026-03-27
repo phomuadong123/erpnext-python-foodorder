@@ -14,6 +14,12 @@ services:
       DB_PORT: "3306"
       MYSQL_ROOT_PASSWORD: admin
       MARIADB_ROOT_PASSWORD: admin
+      ZALO_APP_ID: ${ZALO_APP_ID}
+      ZALO_SECRET: ${ZALO_SECRET}
+      ZALO_OA_ACCESS_TOKEN: ${ZALO_OA_ACCESS_TOKEN}
+      GROUP_ID_ZALO: ${GROUP_ID_ZALO}
+      ZALO_REDIRECT_URI: ${ZALO_REDIRECT_URI}
+      BASE_URL: ${BASE_URL}
 
   configurator:
     image: frappe/erpnext:v15
@@ -123,7 +129,7 @@ services:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
     ports:
-      - "8080:8080"
+      - "80:8080"
 
   queue-long:
     image: frappe/erpnext:v15
